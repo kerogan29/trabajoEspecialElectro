@@ -1,6 +1,5 @@
 ''' Trabajo especial de Electrómagnetismo
     Resolución mediante el método de relajación
-    Gastón Rial Saibene
     Facultad de Ingeniería - Universidad de Montevideo
     2016
 '''
