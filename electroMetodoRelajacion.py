@@ -1,6 +1,5 @@
 ''' Trabajo especial de Electrómagnetismo
     Resolución mediante el método de relajación
-    Gastón Rial Saibene
     Facultad de Ingeniería - Universidad de Montevideo
     2016
 '''
@@ -135,13 +134,13 @@ class ErrorNum(BaseException):
         print(mensaje)
 
 if __name__ == "__main__":
-    t=Tubo(12)
+    t=Tubo(10)
     print("Mesh Relaxation method")
     print("Info:\n\tTamaño de Mesh:",t.gridSize)
-    cij=t.capacitanceCoeff(1,3,0.000000001)
+    cij=t.capacitanceCoeff(1,3,0.00001)
     print("\tC13=\t",cij)
-    l=Tubo(12)
-    cji=l.capacitanceCoeff(3,1,0.000000001)
+    l=Tubo(10)
+    cji=l.capacitanceCoeff(3,1,0.00001)
     print("\tC31=\t",cji)
     print("\tPromedio(C13+C31/2)= ",(cij+cji)/2)
     print("\tdiff=\t",np.abs(cij-cji))
