@@ -182,36 +182,36 @@ class Tubo:                 # Clase que representa a la seccion transversal del 
             c13=0
             for i in range(0,int(n/2)-1):
                 c13+=vecCharge[i]
-                return np.abs(c13*(n/2))
+                return np.abs(c13*(1/2))
         if i==2:
             c13 = 0
             for i in range(int(n/2), 2*n-1):
                 c13 += vecCharge[i]
-                return np.abs(c13*(3/2)*n)
+                return np.abs(c13*(3/2))
         if i==3:
             c13 = 0
             for i in range(2*n, int(7/2)*n-1):
                 c13 += vecCharge[i]
-                return np.abs(c13 * (3 / 2)*n)
+                return np.abs(c13 * (3 / 2))
         if i==4:
             c13 = 0
             for i in range(int(7 / 2) * n, (4*n)-1):
                 c13 += vecCharge[i]
-                return np.abs(c13*(n/2))
+                return np.abs(c13*(1/2))
 
 class ErrorNum(BaseException):
     def __init__(self, mensaje):
         print(mensaje)
 
 if __name__ == "__main__":
-    t=Tubo(100)
+    t=Tubo(20)
     #print(t.calcCoef(3,1))
     #print(t.matrixSearch(3,3))
     print("Method of Moments")
     print("Info:\n\tTamaño de Mesh:",t.gridSize)
     cij=t.calcCoef(1,3)
     print("\tC13=\t",cij)
-    l=Tubo(100)
+    l=Tubo(20)
     cji=l.calcCoef(3,1)
     print("\tC31=\t",cji)
     print("\tPromedio(C13+C31/2)= ",(cij+cji)/2)

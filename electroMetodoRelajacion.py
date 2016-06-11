@@ -7,6 +7,7 @@
 # Modules goes here
 import numpy as np          # Modulo de calculo matricial
 from scipy import constants as s # Modulo para uso de permitividad en el vacio
+
 # Code starts here
 class Tubo:                 # Clase que representa a la seccion transversal del tubo
                             # Definir varibles
@@ -108,25 +109,25 @@ class Tubo:                 # Clase que representa a la seccion transversal del 
         if nrocond == 1:
             for c in range(0, int(n / 2)):
                 sum1+= ret[0][c]
-            coeff= (sum1*(n/2))
+            coeff= (sum1*(1/2))
         elif nrocond == 2:
             for c in range(0, int(n / 2) - 1):
                 sum1 += ret[0][int(n / 2) + c]
-            coeff = (sum1 * (n / 2))
+            coeff = (sum1 * (1/ 2))
             for c in range(0, n):
                 sum2 += ret[c][n - 1]
-            coeff += (sum2 * n)
+            coeff += sum2
         elif nrocond == 3:
             for c in range(0, int(n / 2) - 1):
                 sum1 += ret[int(n / 2) + c][0]
-            coeff = (sum1 * (n / 2))
+            coeff = (sum1 * (1 / 2))
             for c in range(0, n):
                 sum2 += ret[n - 1][c]
-            coeff += (sum2 * n)
+            coeff += sum2
         elif nrocond == 4:
             for c in range(0, int(n / 2)):
                 sum1 += ret[c][0]
-            coeff = (sum1 * (n / 2))
+            coeff = (sum1 * (1 / 2))
         return coeff
 
 class ErrorNum(BaseException):
@@ -134,13 +135,13 @@ class ErrorNum(BaseException):
         print(mensaje)
 
 if __name__ == "__main__":
-    t=Tubo(10)
+    t=Tubo(20)
     print("Mesh Relaxation method")
     print("Info:\n\tTamaño de Mesh:",t.gridSize)
-    cij=t.capacitanceCoeff(1,3,0.0000000000000000000000000000000000000000000001)
+    cij=t.capacitanceCoeff(1,3,0.000000001)
     print("\tC13=\t",cij)
-    l=Tubo(10)
-    cji=l.capacitanceCoeff(3,1,0.0000000000000000000000000000000000000000000001)
+    l=Tubo(20)
+    cji=l.capacitanceCoeff(3,1,0.000000001)
     print("\tC31=\t",cji)
     print("\tPromedio(C13+C31/2)= ",(cij+cji)/2)
     print("\tdiff=\t",np.abs(cij-cji))
