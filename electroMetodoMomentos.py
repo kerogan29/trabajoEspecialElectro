@@ -36,6 +36,27 @@ class Tubo:                 # Clase que representa a la seccion transversal del 
             for c in range(0,int(n/2)):
                 self.seccTubo[c][0]= value
 
+    def voltVector(self):
+        n=self.gridSize
+        vVoltage=np.ones(4*n) # Todos los conductores inicializados en cero
+        cte= -2*s.pi*s.epsilon_0
+        i=0
+        while i< vVoltage.shape[0]:
+            if i<= n/2:
+                vVoltage[i]=self.seccTubo[0][i]
+            elif i>n/2 and i<n:
+                vVoltage[i] = self.seccTubo[0][i]
+            elif i>=n and i<2*n:
+                vVoltage[i] = self.seccTubo[i-n][n-1]
+            elif i>=2*n and i<(5/2)*n:
+                vVoltage[i] = self.seccTubo[i-int((3/2)*n)][0]
+            elif i>=(5/2)*n and i<(7/2)*n:
+                vVoltage[i] = self.seccTubo[n-1][i-int((5/2)*n)]
+            else:
+                vVoltage[i] = self.seccTubo[int(i-(7/2)*n)][n-1]
+            i+=1
+        return vVoltage*cte
+
     def matrixDistAux(self):
         ret=[] #np.zeros((self.gridSize,self.gridSize), dtype=(np.int,(2,2)))
         i=0
@@ -52,66 +73,23 @@ class Tubo:                 # Clase que representa a la seccion transversal del 
 
     def logDist(self,i1,i2,j1,j2): # Fila 1, Columna 1/ Fila 2, Columna2
         dist1 = np.power(self.matrixSearch(int(i1), int(i2))[0] - self.matrixSearch(int(j1), int(j2))[0], 2)
-        dist2 = np.power(self.matrixSearch(i1, i2)[1] - self.matrixSearch(int(j1), int(j2))[1], 2)
+        dist2 = np.power(self.matrixSearch(int(i1), int(i2))[1] - self.matrixSearch(int(j1), int(j2))[1], 2)
         dist = np.sqrt(dist1 + dist2)
         if dist==0:
             return 0
         else:
             return np.log(dist)
 
-    def lMatrix(self):
-        n=self.gridSize
-        matdist= self.matrixDistAux()
-        l=np.zeros((2*n,2*n)) # Defino la matriz l como una cuadrada de n/2+n
-        ratio=(1/2)*(np.log(1/2))-1/2 # valor usado cuando i=j
-        i=0 # Fila
-        while i< l.shape[0]:
-            j=0 # Columnna
-            while j<l.shape[0]:
-                if i==j :
-                    temp=ratio          #ratio*(1/(s.pi*s.epsilon_0))
-                    l[i][j]= temp       # FALTA EPSILON_0
-                elif (i<n/2 and j<n/2):
-                    l[i][j]= np.log(np.abs(i-j))#1/(s.pi*np.abs(i-j)) # FALTA EPSILON_0
-                    l[j][i]=l[i][j]
-                elif (i>n/2 and j>n/2):
-                    if ((i-n/2)<n and (j-n/2)<n): # Me encuntro en segmento horizontal del conductor 3
-                        l[i][j] = np.log(np.abs(i - j))#1 / (s.pi * np.abs(i - j))  # FALTA EPSILON_0
-                        l[j][i] = l[i][j]
-                    elif ((i-n/2)>n and (j-n/2)>n):
-                        l[i][j]= np.log(np.abs(i - j)) #1 / (s.pi * np.abs(i - j))
-                        l[j][i]= l[i][j]
-                elif (i<n/2 and j>n/2):
-                    if j<(3/2)*n:
-                        dist1= np.power((matdist[0][i][0][0]-matdist[n-1][j-n/2][0][0]),2)
-                        dist2= np.power((matdist[0][i][0][1]-matdist[n-1][j-n/2][0][1]),2)
-                        if not (dist1 == 0 and dist2 == 0):
-                            l[i][j]= np.log(np.sqrt(dist1+dist2)) #1/(s.pi * np.sqrt(np.power((matdist[0][i][0][0]-matdist[n-1][j-n/2][0][0]),2)+np.power((matdist[0][i][0][1]-matdist[n-1][j-n/2][0][1]),2)))
-                            l[j][i]= l[i][j]
-                        else:
-                            print(matdist[0][i][0][0],matdist[n-1][j-n/2][0][0],matdist[0][i][0][1],matdist[n-1][j-n/2][0][1])
-                    else:
-                        dist1= np.power((matdist[0][i][0][0] - matdist[j - (3/2)*n][0][0][0]), 2)
-                        dist2=  np.power((matdist[0][i][0][1] - matdist[j - (3/2)*n][0][0][1]), 2)
-                        if not (dist1== 0 and dist2== 0):
-                            l[i][j] = np.log(np.sqrt(dist1+dist2)) #1/(s.pi * np.sqrt(np.power((matdist[0][i][0][0] - matdist[j - (3/2)*n][0][0][0]), 2)+ np.power((matdist[0][i][0][1] - matdist[j - (3/2)*n][0][0][1]), 2)))
-                            l[j][i] = l[i][j]
-                        else:
-                          print(matdist[0][i][0][0],"llol")
-                j+=1
-            i+=1
-        return l
-
     def llMatrix(self):
         n = self.gridSize
         l = np.zeros((4 * n, 4 * n))  # Defino la matriz l como una cuadrada de n/2+n
-        ratio = (1 / 2) * (np.log(1 / 2)) - 1 / 2  # valor usado cuando i=j
+        ratio = -(np.log(2)+1)#(1 / 2) * (np.log(1 / 2)) - 1 / 2  # valor usado cuando i=j
         i = 0  # Fila
         while i < l.shape[0]:
             j = i  # Columnna
             while j < l.shape[0]:
-                if i == j:
-                    temp = ratio  # ratio*(1/(s.pi*s.epsilon_0))
+                if i == j:              # Interacción del bloque consigo mismo
+                    temp = ratio        # ratio*(1/(s.pi*s.epsilon_0))
                     l[i][j] = temp
                 elif (i<n/2 and j<n/2): # Lo mismo j<n/2 # Conductor 1 sobre cond1
                     l[i][j] = self.logDist(0,i,0,j)
@@ -133,7 +111,7 @@ class Tubo:                 # Clase que representa a la seccion transversal del 
                                 l[i][j] = self.logDist(0, i, j-n, n - 1)
                                 l[j][i] = l[i][j]
                             else:
-                                l[i][j] = self.logDist(i-1,n-1,j-n, n - 1)
+                                l[i][j] = self.logDist(i-n,n-1,j-n, n - 1)
                                 l[j][i] = l[i][j]
                 elif(j>=2*n and j<(7/2)*n): # Cond 3
                     if i<n/2:               # Cond1 sobre 3
@@ -161,7 +139,7 @@ class Tubo:                 # Clase que representa a la seccion transversal del 
                             l[i][j] = self.logDist(i - (2 * n), 0, j - (2 * n), 0)
                             l[j][i] = l[i][j]
                         elif j>=(5/2)*n and i>=(5/2)*n:
-                            l[i][j] = self.logDist(n-1, i-(5/2)*n, n-1, j-(5/2)*n)
+                            l[i][j] = self.logDist(n-1, i-((5/2)*n), n-1, j-((5/2)*n))
                             l[j][i] = l[i][j]
                         else:
                             l[i][j] = self.logDist(i - (2 * n), 0,  n-1, j-(5/2)*n)
@@ -188,13 +166,24 @@ class Tubo:                 # Clase que representa a la seccion transversal del 
                 j+=1
             i+=1
         return l
+
+    def inv(self,a):
+        return np.lianlg(a) # Devuelve la matriz inversa
+
 class ErrorNum(BaseException):
     def __init__(self, mensaje):
         print(mensaje)
 
 if __name__ == "__main__":
-    t=Tubo(4)
-    print(t.llMatrix())
+    t=Tubo(10)
+    matriz=t.llMatrix()
+    t.setVoltage(1,1)
+    t.setVoltage(3,-1)
+    vecCharge=np.dot(matriz,t.voltVector())
+    x=0
+    for i in (0,1,2,3):
+        x+=vecCharge[i]
+    print(x)
     #print(t.matrixSearch(3,3))
     #print("Mesh Relaxation method")
     #print("Info:\n\tTamaño de Mesh:",t.gridSize)
