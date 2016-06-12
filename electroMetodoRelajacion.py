@@ -7,6 +7,7 @@
 # Modules goes here
 import numpy as np          # Modulo de calculo matricial
 from scipy import constants as s # Modulo para uso de permitividad en el vacio
+import matplotlib.pyplot as plt
 
 # Code starts here
 class Tubo:                 # Clase que representa a la seccion transversal del tubo
@@ -135,16 +136,43 @@ class ErrorNum(BaseException):
         print(mensaje)
 
 if __name__ == "__main__":
-    t=Tubo(20)
-    print("Mesh Relaxation method")
-    print("Info:\n\tTamaño de Mesh:",t.gridSize)
-    cij=t.capacitanceCoeff(1,3,0.000000001)
-    print("\tC13=\t",cij)
-    l=Tubo(20)
-    cji=l.capacitanceCoeff(3,1,0.000000001)
-    print("\tC31=\t",cji)
-    print("\tPromedio(C13+C31/2)= ",(cij+cji)/2)
-    print("\tdiff=\t",np.abs(cij-cji))
+    #print("Mesh Relaxation method")
+    #print("Info:\n\tTamaño de Mesh:",t.gridSize)
+    #cij=t.capacitanceCoeff(1,3,0.000000001)
+
+    #l=Tubo(20)
+    error=0.0000000001
+    j=0
+    mesh=np.zeros(5)
+    cij=np.zeros(5)
+    cji=np.zeros(5)
+
+    for i in (10,40,70,90,120):
+        print("Mesh Relaxation method")
+        print("Info:\n\tTamaño de Mesh:",i)
+        print("\tDiff de detención:",error)
+        t = Tubo(i)
+        l = Tubo(i)
+        cij[j] = t.capacitanceCoeff(1, 3, error)
+        cji[j] = l.capacitanceCoeff(3,1,error)
+        print("\tC13=\t",cij[j])
+        print("\tC31=\t",cji[j])
+        print("\tPromedio(C13+C31/2)= ",(cij[j]+cji[j])/2)
+        print("\tdiff=\t",np.abs(cij[j]-cji[j]))
+        mesh[j] = i
+        j+=1
+    plt.figure(1)
+    plt.plot(mesh,cij)
+    plt.xlabel("mesh_size")
+    plt.ylabel("capacitance_coeff c13")
+
+    plt.figure(2)
+    plt.plot(mesh, cji)
+    plt.xlabel("mesh_size")
+    plt.ylabel("capacitance_coeff c31")
+    plt.show()
+    #print("\tPromedio(C13+C31/2)= ",(cij+cji)/2)
+    #print("\tdiff=\t",np.abs(cij-cji))
     #print(t.seccTubo)
     #t.setVoltage(4)
     #t.manyMeshRelaxation(2)

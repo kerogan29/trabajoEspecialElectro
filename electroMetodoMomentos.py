@@ -6,7 +6,7 @@
 # Modules goes here
 import numpy as np
 from scipy import constants as s
-
+import matplotlib.pyplot as plt
 # Code starts here
 class Tubo:                 # Clase que representa a la seccion transversal del tubo
                             # Definir varibles
@@ -204,15 +204,31 @@ class ErrorNum(BaseException):
         print(mensaje)
 
 if __name__ == "__main__":
-    t=Tubo(20)
-    #print(t.calcCoef(3,1))
-    #print(t.matrixSearch(3,3))
-    print("Method of Moments")
-    print("Info:\n\tTamaño de Mesh:",t.gridSize)
-    cij=t.calcCoef(1,3)
-    print("\tC13=\t",cij)
-    l=Tubo(20)
-    cji=l.calcCoef(3,1)
-    print("\tC31=\t",cji)
-    print("\tPromedio(C13+C31/2)= ",(cij+cji)/2)
-    print("\tdiff=\t",np.abs(cij-cji))
+    j = 0
+    mesh = np.zeros(5)
+    cij = np.zeros(5)
+    cji = np.zeros(5)
+
+    for i in (10, 40, 70, 90, 120):
+        print("Method of Moments")
+        print("Info:\n\tTamaño de Mesh:", i)
+        t = Tubo(i)
+        l = Tubo(i)
+        cij[j] = t.calcCoef(1,3)
+        cji[j] = l.calcCoef(3, 1)
+        print("\tC13=\t", cij[j])
+        print("\tC31=\t", cji[j])
+        print("\tPromedio(C13+C31/2)= ", (cij[j] + cji[j]) / 2)
+        print("\tdiff=\t", np.abs(cij[j] - cji[j]))
+        mesh[j] = i
+        j += 1
+    plt.figure(1)
+    plt.plot(mesh, cij)
+    plt.xlabel("mesh_size")
+    plt.ylabel("capacitance_coeff c13")
+
+    plt.figure(2)
+    plt.plot(mesh, cji)
+    plt.xlabel("mesh_size")
+    plt.ylabel("capacitance_coeff c31")
+    plt.show()
